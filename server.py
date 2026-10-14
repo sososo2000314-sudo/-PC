@@ -1,83 +1,606 @@
 
+import hashlib
+import hmac
 import json
 import os
+import re
+import secrets
 import sqlite3
+import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlparse, parse_qs
 
 BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = Path(os.environ.get("DB_PATH", str(BASE_DIR / "data.db")))
+DB_PATH = os.environ.get("DB_PATH", str(BASE_DIR / "data.db"))
+PORT = int(os.environ.get("PORT", "8000"))
+MAX_BODY = 5_000_000
+
+
+def connect():
+    db = sqlite3.connect(DB_PATH, timeout=30)
+    db.row_factory = sqlite3.Row
+    db.execute("PRAGMA foreign_keys = ON")
+    return db
+
 
 def initialize_db():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(DB_PATH) as conn:
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS app_state (
-                id INTEGER PRIMARY KEY CHECK (id = 1),
-                data TEXT NOT NULL
-            )
+    with connect() as db:
+        db.executescript("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL COLLATE NOCASE UNIQUE,
+            password_hash TEXT NOT NULL,
+            salt TEXT NOT NULL,
+            display_name TEXT NOT NULL DEFAULT '',
+            avatar TEXT NOT NULL DEFAULT '',
+            created REAL NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS sessions (
+            token_hash TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            created REAL NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS posts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            post_type TEXT NOT NULL DEFAULT 'text',
+            title TEXT NOT NULL DEFAULT '',
+            body TEXT NOT NULL DEFAULT '',
+            media TEXT NOT NULL DEFAULT '',
+            filename TEXT NOT NULL DEFAULT '',
+            thumbnail TEXT NOT NULL DEFAULT '',
+            orientation TEXT NOT NULL DEFAULT 'vertical',
+            created REAL NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            body TEXT NOT NULL,
+            created REAL NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS likes (
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+            created REAL NOT NULL,
+            PRIMARY KEY (user_id, post_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS follows (
+            follower_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            following_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            created REAL NOT NULL,
+            PRIMARY KEY (follower_id, following_id),
+            CHECK (follower_id != following_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            recipient_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            body TEXT NOT NULL DEFAULT '',
+            image TEXT NOT NULL DEFAULT '',
+            created REAL NOT NULL
+        );
+
+        CREATE INDEX IF NOT EXISTS posts_created_idx ON posts(created);
+        CREATE INDEX IF NOT EXISTS comments_post_idx ON comments(post_id);
+        CREATE INDEX IF NOT EXISTS messages_pair_idx
+            ON messages(sender_id, recipient_id, created);
         """)
-        conn.execute(
-            "INSERT OR IGNORE INTO app_state (id, data) VALUES (1, '{}')"
-        )
+
+
+def password_hash(password, salt):
+    return hashlib.pbkdf2_hmac(
+        "sha256", password.encode(), salt.encode(), 600000
+    ).hex()
+
+
+def public_user(row):
+    return {
+        "id": row["id"],
+        "username": row["username"],
+        "name": row["display_name"] or row["username"],
+        "avatar": row["avatar"] or "",
+        "created": row["created"]
+    }
+
 
 class Handler(SimpleHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/api/state":
-            with sqlite3.connect(DB_PATH) as conn:
-                row = conn.execute(
-                    "SELECT data FROM app_state WHERE id = 1"
-                ).fetchone()
-            body = (row[0] if row else "{}").encode("utf-8")
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=str(BASE_DIR), **kwargs)
 
-        if self.path == "/":
-            self.path = "/index.html"
-        super().do_GET()
+    def send_json(self, status, obj):
+        raw = json.dumps(obj, ensure_ascii=False).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(raw)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+        self.wfile.write(raw)
 
-    def do_POST(self):
-        if self.path != "/api/state":
-            self.send_error(404)
-            return
-
+    def read_json(self):
         try:
             length = int(self.headers.get("Content-Length", "0"))
-            if length <= 0 or length > 5_000_000:
-                self.send_error(413, "Invalid request size")
-                return
+        except ValueError:
+            raise ValueError("リクエストサイズが不正です")
 
-            data = json.loads(self.rfile.read(length))
-            if not isinstance(data, dict):
-                self.send_error(400, "Expected a JSON object")
-                return
+        if length < 0 or length > MAX_BODY:
+            raise ValueError("データが大きすぎます（最大5MB）")
 
-            serialized = json.dumps(data, ensure_ascii=False)
-            with sqlite3.connect(DB_PATH) as conn:
-                conn.execute(
-                    "UPDATE app_state SET data = ? WHERE id = 1",
-                    (serialized,)
-                )
+        raw = self.rfile.read(length)
+        try:
+            data = json.loads(raw.decode("utf-8") or "{}")
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            raise ValueError("JSONの形式が正しくありません")
 
-            body = b'{"ok":true}'
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
+        if not isinstance(data, dict):
+            raise ValueError("データの形式が正しくありません")
+        return data
 
-        except (ValueError, json.JSONDecodeError):
-            self.send_error(400, "Invalid JSON")
+    def current_user(self, db):
+        header = self.headers.get("Authorization", "")
+        if not header.startswith("Bearer "):
+            return None
+        token = header[7:].strip()
+        if not token:
+            return None
 
-    def log_message(self, format, *args):
-        print(format % args)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        return db.execute("""
+            SELECT u.* FROM sessions s
+            JOIN users u ON u.id = s.user_id
+            WHERE s.token_hash = ?
+        """, (token_hash,)).fetchone()
 
-if __name__ == "__main__":
-    initialize_db()
-    port = int(os.environ.get("PORT", "8000"))
-    print(f"Japan Connect server starting on port {port}")
-    ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()
+    def new_session(self, db, user_id):
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        db.execute(
+            "INSERT INTO sessions(token_hash,user_id,created) VALUES(?,?,?)",
+            (token_hash, user_id, time.time())
+        )
+        return token
+
+    def do_GET(self):
+        parsed = urlparse(self.path)
+        path = parsed.path
+
+        if not path.startswith("/api/"):
+            if path == "/":
+                self.path = "/index.html"
+            return super().do_GET()
+
+        try:
+            with connect() as db:
+                user = self.current_user(db)
+
+                if path == "/api/health":
+                    return self.send_json(200, {"ok": True})
+
+                if not user:
+                    return self.send_json(401, {
+                        "ok": False, "error": "ログインしてください"
+                    })
+
+                if path == "/api/me":
+                    return self.send_json(200, {
+                        "ok": True, "user": public_user(user)
+                    })
+
+                if path == "/api/profile":
+                    return self.send_json(200, {
+                        "ok": True, "user": public_user(user)
+                    })
+
+                if path == "/api/users":
+                    query = parse_qs(parsed.query).get("q", [""])[0].strip()
+                    rows = db.execute("""
+                        SELECT * FROM users
+                        WHERE id != ?
+                          AND (username LIKE ? OR display_name LIKE ?)
+                        ORDER BY username LIMIT 50
+                    """, (user["id"], "%" + query + "%", "%" + query + "%")).fetchall()
+                    result = []
+                    for row in rows:
+                        item = public_user(row)
+                        item["following"] = bool(db.execute(
+                            "SELECT 1 FROM follows WHERE follower_id=? AND following_id=?",
+                            (user["id"], row["id"])
+                        ).fetchone())
+                        result.append(item)
+                    return self.send_json(200, {"ok": True, "users": result})
+
+                if path == "/api/feed":
+                    rows = db.execute("""
+                        SELECT p.*, u.username, u.display_name, u.avatar
+                        FROM posts p JOIN users u ON u.id = p.user_id
+                        ORDER BY p.created DESC, p.id DESC LIMIT 200
+                    """).fetchall()
+                    posts = []
+                    for row in rows:
+                        comments = db.execute("""
+                            SELECT c.id, c.user_id, c.body, c.created,
+                                   u.username, u.display_name, u.avatar
+                            FROM comments c JOIN users u ON u.id = c.user_id
+                            WHERE c.post_id = ? ORDER BY c.created
+                        """, (row["id"],)).fetchall()
+                        posts.append({
+                            "id": row["id"],
+                            "userId": row["user_id"],
+                            "author": row["display_name"] or row["username"],
+                            "username": row["username"],
+                            "avatar": row["avatar"],
+                            "type": row["post_type"],
+                            "title": row["title"],
+                            "text": row["body"],
+                            "media": row["media"],
+                            "filename": row["filename"],
+                            "thumbnail": row["thumbnail"],
+                            "orientation": row["orientation"],
+                            "created": row["created"],
+                            "likes": db.execute(
+                                "SELECT COUNT(*) FROM likes WHERE post_id=?",
+                                (row["id"],)
+                            ).fetchone()[0],
+                            "liked": bool(db.execute(
+                                "SELECT 1 FROM likes WHERE user_id=? AND post_id=?",
+                                (user["id"], row["id"])
+                            ).fetchone()),
+                            "comments": [{
+                                "id": c["id"],
+                                "userId": c["user_id"],
+                                "author": c["display_name"] or c["username"],
+                                "username": c["username"],
+                                "avatar": c["avatar"],
+                                "text": c["body"],
+                                "created": c["created"]
+                            } for c in comments]
+                        })
+                    return self.send_json(200, {"ok": True, "posts": posts})
+
+                if path == "/api/follows":
+                    rows = db.execute("""
+                        SELECT u.* FROM follows f
+                        JOIN users u ON u.id = f.following_id
+                        WHERE f.follower_id = ? ORDER BY u.username
+                    """, (user["id"],)).fetchall()
+                    return self.send_json(200, {
+                        "ok": True, "users": [public_user(r) for r in rows]
+                    })
+
+                if path == "/api/messages":
+                    other = parse_qs(parsed.query).get("with", [""])[0]
+                    if not other:
+                        rows = db.execute("""
+                            SELECT m.*, a.username AS sender_name,
+                                   b.username AS recipient_name
+                            FROM messages m
+                            JOIN users a ON a.id=m.sender_id
+                            JOIN users b ON b.id=m.recipient_id
+                            WHERE m.sender_id=? OR m.recipient_id=?
+                            ORDER BY m.created DESC LIMIT 200
+                        """, (user["id"], user["id"])).fetchall()
+                    else:
+                        target = db.execute(
+                            "SELECT id FROM users WHERE username=? COLLATE NOCASE",
+                            (other,)
+                        ).fetchone()
+                        if not target:
+                            return self.send_json(404, {
+                                "ok": False, "error": "相手のアカウントが見つかりません"
+                            })
+                        rows = db.execute("""
+                            SELECT m.*, a.username AS sender_name,
+                                   b.username AS recipient_name
+                            FROM messages m
+                            JOIN users a ON a.id=m.sender_id
+                            JOIN users b ON b.id=m.recipient_id
+                            WHERE (m.sender_id=? AND m.recipient_id=?)
+                               OR (m.sender_id=? AND m.recipient_id=?)
+                            ORDER BY m.created LIMIT 500
+                        """, (user["id"], target["id"],
+                              target["id"], user["id"])).fetchall()
+
+                    return self.send_json(200, {
+                        "ok": True,
+                        "messages": [{
+                            "id": r["id"],
+                            "from": r["sender_name"],
+                            "to": r["recipient_name"],
+                            "text": r["body"],
+                            "image": r["image"],
+                            "created": r["created"]
+                        } for r in rows]
+                    })
+
+                return self.send_json(404, {
+                    "ok": False, "error": "APIが見つかりません"
+                })
+        except Exception as exc:
+            print("GET API error:", repr(exc))
+            return self.send_json(500, {
+                "ok": False, "error": "サーバー内部でエラーが発生しました"
+            })
+
+    def do_POST(self):
+        path = urlparse(self.path).path
+        try:
+            data = self.read_json()
+        except ValueError as exc:
+            return self.send_json(400, {"ok": False, "error": str(exc)})
+
+        try:
+            with connect() as db:
+                if path == "/api/register":
+                    username = str(data.get("username", "")).strip()
+                    password = str(data.get("password", ""))
+
+                    if not re.fullmatch(r"[A-Za-z0-9_-]{3,24}", username):
+                        return self.send_json(400, {
+                            "ok": False,
+                            "error": "アカウント名は半角英数字・_・-の3〜24文字にしてください"
+                        })
+                    if len(password) < 8 or len(password) > 128:
+                        return self.send_json(400, {
+                            "ok": False, "error": "パスワードは8〜128文字にしてください"
+                        })
+                    salt = secrets.token_hex(16)
+                    try:
+                        cur = db.execute("""
+                            INSERT INTO users(username,password_hash,salt,created)
+                            VALUES(?,?,?,?)
+                        """, (username, password_hash(password, salt), salt, time.time()))
+                    except sqlite3.IntegrityError:
+                        return self.send_json(409, {
+                            "ok": False, "error": "そのアカウント名はすでに使われています"
+                        })
+                    user_id = cur.lastrowid
+                    token = self.new_session(db, user_id)
+                    row = db.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
+                    return self.send_json(201, {
+                        "ok": True, "token": token, "user": public_user(row)
+                    })
+
+                if path == "/api/login":
+                    username = str(data.get("username", "")).strip()
+                    password = str(data.get("password", ""))
+                    row = db.execute(
+                        "SELECT * FROM users WHERE username=? COLLATE NOCASE",
+                        (username,)
+                    ).fetchone()
+                    if not row or not hmac.compare_digest(
+                        row["password_hash"], password_hash(password, row["salt"])
+                    ):
+                        return self.send_json(401, {
+                            "ok": False, "error": "アカウント名またはパスワードが違います"
+                        })
+                    token = self.new_session(db, row["id"])
+                    return self.send_json(200, {
+                        "ok": True, "token": token, "user": public_user(row)
+                    })
+
+                user = self.current_user(db)
+                if not user:
+                    return self.send_json(401, {
+                        "ok": False, "error": "ログインしてください"
+                    })
+
+                if path == "/api/logout":
+                    header = self.headers.get("Authorization", "")
+                    token = header[7:].strip() if header.startswith("Bearer ") else ""
+                    if token:
+                        db.execute(
+                            "DELETE FROM sessions WHERE token_hash=?",
+                            (hashlib.sha256(token.encode()).hexdigest(),)
+                        )
+                    return self.send_json(200, {"ok": True})
+
+                if path == "/api/profile":
+                    name = str(data.get("name", "")).strip()[:60]
+                    avatar = str(data.get("avatar", ""))
+                    if len(avatar) > 1_500_000:
+                        return self.send_json(400, {
+                            "ok": False, "error": "プロフィール画像が大きすぎます"
+                        })
+                    db.execute(
+                        "UPDATE users SET display_name=?, avatar=? WHERE id=?",
+                        (name or user["username"], avatar, user["id"])
+                    )
+                    row = db.execute(
+                        "SELECT * FROM users WHERE id=?", (user["id"],)
+                    ).fetchone()
+                    return self.send_json(200, {
+                        "ok": True, "user": public_user(row)
+                    })
+
+                if path == "/api/posts":
+                    post_type = str(data.get("type", "text"))[:30]
+                    title = str(data.get("title", ""))[:200]
+                    body = str(data.get("text", ""))[:20000]
+                    media = str(data.get("media", ""))
+                    filename = str(data.get("filename", ""))[:255]
+                    thumbnail = str(data.get("thumbnail", ""))
+                    orientation = str(data.get("orientation", "vertical"))
+                    if len(media) + len(thumbnail) > 4_500_000:
+                        return self.send_json(400, {
+                            "ok": False, "error": "添付ファイルが大きすぎます（合計約4.5MBまで）"
+                        })
+                    cur = db.execute("""
+                        INSERT INTO posts
+                        (user_id,post_type,title,body,media,filename,thumbnail,orientation,created)
+                        VALUES(?,?,?,?,?,?,?,?,?)
+                    """, (user["id"], post_type, title, body, media,
+                          filename, thumbnail, orientation, time.time()))
+                    return self.send_json(201, {
+                        "ok": True, "id": cur.lastrowid
+                    })
+
+                match = re.fullmatch(r"/api/posts/(\d+)/delete", path)
+                if match:
+                    post_id = int(match.group(1))
+                    cur = db.execute(
+                        "DELETE FROM posts WHERE id=? AND user_id=?",
+                        (post_id, user["id"])
+                    )
+                    if cur.rowcount == 0:
+                        return self.send_json(404, {
+                            "ok": False, "error": "投稿が見つからないか、削除する権限がありません"
+                        })
+                    return self.send_json(200, {"ok": True})
+
+                match = re.fullmatch(r"/api/posts/(\d+)/like", path)
+                if match:
+                    post_id = int(match.group(1))
+                    exists = db.execute(
+                        "SELECT 1 FROM likes WHERE user_id=? AND post_id=?",
+                        (user["id"], post_id)
+                    ).fetchone()
+                    if exists:
+                        db.execute(
+                            "DELETE FROM likes WHERE user_id=? AND post_id=?",
+                            (user["id"], post_id)
+                        )
+                        liked = False
+                    else:
+                        if not db.execute(
+                            "SELECT 1 FROM posts WHERE id=?", (post_id,)
+                        ).fetchone():
+                            return self.send_json(404, {
+                                "ok": False, "error": "投稿が見つかりません"
+                            })
+                        db.execute(
+                            "INSERT INTO likes(user_id,post_id,created) VALUES(?,?,?)",
+                            (user["id"], post_id, time.time())
+                        )
+                        liked = True
+                    count = db.execute(
+                        "SELECT COUNT(*) FROM likes WHERE post_id=?", (post_id,)
+                    ).fetchone()[0]
+                    return self.send_json(200, {
+                        "ok": True, "liked": liked, "likes": count
+                    })
+
+                match = re.fullmatch(r"/api/posts/(\d+)/comments", path)
+                if match:
+                    post_id = int(match.group(1))
+                    body = str(data.get("text", "")).strip()
+                    if not body or len(body) > 5000:
+                        return self.send_json(400, {
+                            "ok": False, "error": "コメントは1〜5000文字にしてください"
+                        })
+                    if not db.execute(
+                        "SELECT 1 FROM posts WHERE id=?", (post_id,)
+                    ).fetchone():
+                        return self.send_json(404, {
+                            "ok": False, "error": "投稿が見つかりません"
+                        })
+                    cur = db.execute("""
+                        INSERT INTO comments(post_id,user_id,body,created)
+                        VALUES(?,?,?,?)
+                    """, (post_id, user["id"], body, time.time()))
+                    return self.send_json(201, {
+                        "ok": True, "id": cur.lastrowid
+                    })
+
+                match = re.fullmatch(r"/api/comments/(\d+)/delete", path)
+                if match:
+                    comment_id = int(match.group(1))
+                    cur = db.execute("""
+                        DELETE FROM comments
+                        WHERE id=? AND (
+                            user_id=? OR post_id IN
+                            (SELECT id FROM posts WHERE user_id=?)
+                        )
+                    """, (comment_id, user["id"], user["id"]))
+                    if cur.rowcount == 0:
+                        return self.send_json(404, {
+                            "ok": False, "error": "削除できるコメントが見つかりません"
+                        })
+                    return self.send_json(200, {"ok": True})
+
+                match = re.fullmatch(r"/api/users/(\d+)/follow", path)
+                if match:
+                    target_id = int(match.group(1))
+                    if target_id == user["id"]:
+                        return self.send_json(400, {
+                            "ok": False, "error": "自分自身はフォローできません"
+                        })
+                    if not db.execute(
+                        "SELECT 1 FROM users WHERE id=?", (target_id,)
+                    ).fetchone():
+                        return self.send_json(404, {
+                            "ok": False, "error": "アカウントが見つかりません"
+                        })
+                    exists = db.execute(
+                        "SELECT 1 FROM follows WHERE follower_id=? AND following_id=?",
+                        (user["id"], target_id)
+                    ).fetchone()
+                    if exists:
+                        db.execute(
+                            "DELETE FROM follows WHERE follower_id=? AND following_id=?",
+                            (user["id"], target_id)
+                        )
+                        following = False
+                    else:
+                        db.execute(
+                            "INSERT INTO follows(follower_id,following_id,created) VALUES(?,?,?)",
+                            (user["id"], target_id, time.time())
+                        )
+                        following = True
+                    return self.send_json(200, {
+                        "ok": True, "following": following
+                    })
+
+                if path == "/api/messages":
+                    recipient = str(data.get("to", "")).strip()
+                    body = str(data.get("text", ""))[:10000]
+                    image = str(data.get("image", ""))
+                    if len(image) > 1_500_000:
+                        return self.send_json(400, {
+                            "ok": False, "error": "画像が大きすぎます"
+                        })
+                    target = db.execute(
+                        "SELECT * FROM users WHERE username=? COLLATE NOCASE",
+                        (recipient,)
+                    ).fetchone()
+                    if not target:
+                        return self.send_json(404, {
+                            "ok": False, "error": "相手のアカウントが見つかりません"
+                        })
+                    if target["id"] == user["id"]:
+                        return self.send_json(400, {
+                            "ok": False, "error": "自分自身には送信できません"
+                        })
+                    if not body and not image:
+                        return self.send_json(400, {
+                            "ok": False, "error": "メッセージを入力してください"
+                        })
+                    db.execute("""
+                        INSERT INTO messages(sender_id,recipient_id,body,image,created)
+                        VALUES(?,?,?,?,?)
+                    """, (user["id"], target["id"], body, image, time.time()))
+                    return self.send_json(201, {"ok": True})
+
+                return self.send_json(404, {
+                    "ok": False, "error": "APIが見つかりません"
+                })
+
+        except Exception as exc:
+            print("POST API error:", repr(exc))
+            return self.send_json(500, {
+                "ok": False, "error": "サーバー内部でエラーが発生しました"
+            })
+
+
+initialize_db()
+print("Japan Connect サーバー起動")
+print(f"ポート: {PORT}")
+ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
+
