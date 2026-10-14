@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ja">
 <head>
@@ -9,111 +10,375 @@
 body.dark{--bg:#111722;--card:#1b2432;--text:#edf2fb;--muted:#aab5c6;--line:#344052;--accent:#80a6ff;--soft:#263957;--danger:#ff8b83}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 header{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:12px}
-.brand{font-weight:800;font-size:20px;color:var(--accent);white-space:nowrap}.spacer{flex:1}button,input,textarea,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);padding:9px 12px}button.primary{background:var(--accent);border-color:var(--accent);color:white}button:disabled{opacity:.45;cursor:not-allowed}
-main{max-width:760px;margin:18px auto 90px;padding:0 12px}.notice{background:var(--soft);padding:12px 14px;border-radius:12px;color:var(--text);margin-bottom:14px;font-size:14px}
+.brand{font-weight:800;font-size:20px;color:var(--accent);white-space:nowrap}.spacer{flex:1}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);padding:9px 12px}
+button.primary{background:var(--accent);border-color:var(--accent);color:white}
+button.danger{color:var(--danger)}button:disabled{opacity:.45;cursor:not-allowed}
+main{max-width:760px;margin:18px auto 90px;padding:0 12px}
+.notice{background:var(--soft);padding:12px 14px;border-radius:12px;color:var(--text);margin-bottom:14px;font-size:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px #15294a08}
-.row{display:flex;align-items:center;gap:10px}.avatar{width:40px;height:40px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-weight:800;flex-shrink:0;overflow:hidden}.avatar img{width:100%;height:100%;object-fit:cover;display:block}.profile-avatar{width:88px;height:88px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:30px;font-weight:800;overflow:hidden;border:2px solid var(--line)}.profile-avatar img{width:100%;height:100%;object-fit:cover;display:block}.muted{color:var(--muted);font-size:13px}.title{font-weight:750;margin:10px 0 6px;font-size:17px}.bodytext{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.comments{display:none;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}.comments.open{display:block}.commentlist{display:grid;gap:9px;margin-bottom:12px}.comment{border-radius:10px;background:var(--bg);padding:9px 10px}.commenthead{display:flex;align-items:center;gap:8px}.commenthead strong{font-size:13px}.commenttext{margin-top:5px;white-space:pre-wrap;overflow-wrap:anywhere}.commentform{display:flex;gap:8px}.commentform input{min-width:0;flex:1}
-input,textarea,select{width:100%;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px}textarea{min-height:90px;resize:vertical}.composer{display:grid;gap:10px}.hidden{display:none!important}
-.thumb{width:100%;max-height:360px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#10141b;display:block;cursor:pointer;margin-top:12px}.video-frame{position:relative;cursor:pointer}.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:#000a;color:white;font-size:30px;width:68px;height:68px;display:grid;place-items:center;pointer-events:none}.livebadge{display:inline-block;background:#d92332;color:#fff;font-size:12px;font-weight:800;padding:4px 8px;border-radius:6px;margin-left:6px}.endedbadge{display:inline-block;background:#687386;color:#fff;font-size:12px;padding:4px 8px;border-radius:6px;margin-left:6px}
-nav{position:fixed;z-index:6;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:7px 4px calc(7px + env(safe-area-inset-bottom))}nav button{flex:1;max-width:150px;border:0;background:transparent;padding:8px 2px;font-size:12px}nav button.active{background:var(--soft);color:var(--accent);font-weight:750}
-.modal{position:fixed;inset:0;z-index:20;background:#000d;display:none;align-items:center;justify-content:center;padding:14px}.modal.show{display:flex}.modalbox{background:var(--card);color:var(--text);border-radius:16px;padding:14px;width:min(900px,100%);max-height:94vh;overflow:auto}.modal video{display:block;max-width:100%;max-height:72vh;margin:12px auto;background:#000}.modalhead{display:flex;align-items:center;gap:10px}.status{font-size:13px;color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px}
+.avatar{width:40px;height:40px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-weight:800;flex-shrink:0;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.profile-avatar{width:88px;height:88px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-size:30px;font-weight:800;overflow:hidden;border:2px solid var(--line)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.muted{color:var(--muted);font-size:13px}.title{font-weight:750;margin:10px 0 6px;font-size:17px}
+.bodytext{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.comments{display:none;border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+.comments.open{display:block}.commentlist{display:grid;gap:9px;margin-bottom:12px}
+.comment{border-radius:10px;background:var(--bg);padding:9px 10px}
+.commenthead{display:flex;align-items:center;gap:8px}.commenthead strong{font-size:13px}
+.commenttext{margin-top:5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.commentform{display:flex;gap:8px}.commentform input{min-width:0;flex:1}
+input,textarea,select{width:100%;background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px}
+textarea{min-height:90px;resize:vertical}.composer{display:grid;gap:10px}.hidden{display:none!important}
+.thumb{width:100%;max-height:360px;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#10141b;display:block;cursor:pointer;margin-top:12px}
+.video-frame{position:relative;cursor:pointer}
+.play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:#000a;color:white;font-size:30px;width:68px;height:68px;display:grid;place-items:center;pointer-events:none}
+.livebadge{display:inline-block;background:#d92332;color:#fff;font-size:12px;font-weight:800;padding:4px 8px;border-radius:6px;margin-left:6px}
+.endedbadge{display:inline-block;background:#687386;color:#fff;font-size:12px;padding:4px 8px;border-radius:6px;margin-left:6px}
+nav{position:fixed;z-index:6;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;padding:7px 4px calc(7px + env(safe-area-inset-bottom))}
+nav button{flex:1;max-width:150px;border:0;background:transparent;padding:8px 2px;font-size:12px}
+nav button.active{background:var(--soft);color:var(--accent);font-weight:750}
+.modal{position:fixed;inset:0;z-index:20;background:#000d;display:none;align-items:center;justify-content:center;padding:14px}
+.modal.show{display:flex}.modalbox{background:var(--card);color:var(--text);border-radius:16px;padding:14px;width:min(900px,100%);max-height:94vh;overflow:auto}
+.modal video{display:block;max-width:100%;max-height:72vh;margin:12px auto;background:#000}
+.modalhead{display:flex;align-items:center;gap:10px}.status{font-size:13px;color:var(--muted)}
 #livePreview{width:100%;max-height:50vh;background:#000;border-radius:12px;display:block;margin:10px 0}
 hr{border:0;border-top:1px solid var(--line);margin:12px 0}
-@media(max-width:520px){header{padding:10px}.brand{font-size:18px}main{margin-top:12px}.card{padding:12px}.actions button{flex:1} .commentform{flex-wrap:wrap}.commentform button{width:100%}}
+.auth-wrap{max-width:430px;margin:8vh auto}.auth-wrap h1{color:var(--accent);font-size:25px;margin:0 0 8px}
+.auth-tabs{display:flex;gap:8px;margin:16px 0}.auth-tabs button{flex:1}
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.user-row:last-child{border-bottom:0}.user-row .user-detail{flex:1;min-width:0}
+.user-row strong{overflow-wrap:anywhere}.filehint{font-size:12px;color:var(--muted)}
+a{color:var(--accent);overflow-wrap:anywhere}
+@media(max-width:520px){header{padding:10px}.brand{font-size:18px}main{margin-top:12px}.card{padding:12px}.actions button{flex:1}.commentform{flex-wrap:wrap}.commentform button{width:100%}}
 </style>
 </head>
 <body>
-<header><div class="brand">🇯🇵 Japan Connect</div><div class="spacer"></div><span id="who" class="muted">ゲスト</span><button id="settingsBtn" aria-label="設定">⚙️</button></header>
+<header>
+  <div class="brand">🇯🇵 Japan Connect</div>
+  <div class="spacer"></div>
+  <span id="who" class="muted">ログインしていません</span>
+  <button id="settingsBtn" aria-label="テーマ切替" title="ライト／ダーク切替">⚙️</button>
+  <button id="logoutBtn" class="hidden">ログアウト</button>
+</header>
 <main id="main"></main>
-<nav id="nav">
-<button data-page="home" class="active">🏠<br>ホーム</button>
-<button data-page="channel">👤<br>マイチャンネル</button>
-<button data-page="mail">✉️<br>メール</button>
-<button data-page="search">🔍<br>検索</button>
-<button data-page="friends">👥<br>友達</button>
+<nav id="nav" class="hidden">
+  <button data-page="home" class="active">🏠<br>ホーム</button>
+  <button data-page="channel">👤<br>マイチャンネル</button>
+  <button data-page="mail">✉️<br>メール</button>
+  <button data-page="search">🔍<br>検索</button>
+  <button data-page="friends">👥<br>友達</button>
 </nav>
 <div class="modal" id="videoModal" role="dialog" aria-modal="true">
- <div class="modalbox"><div class="modalhead"><strong id="videoTitle">動画</strong><div class="spacer"></div><button id="closeVideo">閉じる ✕</button></div><div id="videoInfo" class="muted"></div><video id="player" controls playsinline></video><div id="videoMessage" class="status"></div></div>
+  <div class="modalbox">
+    <div class="modalhead"><strong id="videoTitle">動画</strong><div class="spacer"></div><button id="closeVideo">閉じる ✕</button></div>
+    <div id="videoInfo" class="muted"></div>
+    <video id="player" controls playsinline></video>
+    <div id="videoMessage" class="status"></div>
+  </div>
 </div>
 <div class="modal" id="liveModal" role="dialog" aria-modal="true">
- <div class="modalbox"><div class="modalhead"><strong>🔴 ライブ配信</strong><div class="spacer"></div><button id="closeLive">閉じる</button></div><p id="liveStatus" class="status">配信準備中</p><video id="livePreview" autoplay muted playsinline></video><div class="actions"><button class="primary" id="startLive">配信を開始</button><button id="endLive" disabled>配信を終了</button></div><p class="muted">この試作品ではカメラ映像をこの端末で表示します。ほかの人へリアルタイム配信するには、別途配信サーバーが必要です。</p></div>
+  <div class="modalbox">
+    <div class="modalhead"><strong>🔴 カメラプレビュー</strong><div class="spacer"></div><button id="closeLive">閉じる</button></div>
+    <p id="liveStatus" class="status">この端末のカメラを確認できます。</p>
+    <video id="livePreview" autoplay muted playsinline></video>
+    <div class="actions"><button class="primary" id="startLive">カメラを開始</button><button id="endLive" disabled>停止</button></div>
+    <p class="muted">これは端末内のカメラプレビューです。他の人にリアルタイム配信するには別の配信サーバーが必要です。</p>
+  </div>
 </div>
 <script>
-(() => {
-const $ = s => document.querySelector(s);
-const storeKey = 'jc_rebuild_v1';
-let data = {name:'デモユーザー',avatar:'',posts:[],page:'home',likes:[],settings:{dark:false},liveStream:null,messages:[]};
-try { const saved=JSON.parse(localStorage.getItem(storeKey)||'null'); if(saved) data={...data,...saved}; } catch(e){}
-let nextId = () => Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-let tempVideoUrl = null, liveStream = null, livePostId = null, openComments = new Set();
-const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function save(){try{localStorage.setItem(storeKey,JSON.stringify(data));}catch(e){/* 保存容量を超えても警告で操作を止めず、現在の画面では投稿を表示する */}}
-function fmt(t){return new Date(t).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});}
-function avatarHtml(name, cls='avatar', image=''){const label=esc((name||'?').slice(0,1));return `<div class="${cls}">${image?`<img src="${esc(image)}" alt="${esc(name||'ユーザー')}のアイコン">`:label}</div>`;}
-function fileData(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result));r.onerror=reject;r.readAsDataURL(file);});}
-function thumbFromVideo(src){return new Promise(resolve=>{const v=document.createElement('video');v.muted=true;v.preload='metadata';v.src=src;v.onloadeddata=()=>{try{v.currentTime=Math.min(1,Math.max(0,v.duration/4));}catch(e){resolve('');}};v.onseeked=()=>{try{const c=document.createElement('canvas');c.width=640;c.height=360;c.getContext('2d').drawImage(v,0,0,640,360);resolve(c.toDataURL('image/jpeg',.72));}catch(e){resolve('');}};v.onerror=()=>resolve('');setTimeout(()=>resolve(''),5000);});}
-function addPost(p){data.posts.unshift({id:nextId(),author:data.name,created:Date.now(),comments:[],likes:0,...p});save();render();}
-function postBy(id){return data.posts.find(p=>p.id===id);}
-function openVideo(id){const p=postBy(id);if(!p)return;$('#videoTitle').textContent=p.title||'動画';$('#videoInfo').textContent=p.author+' ・ '+fmt(p.created)+(p.type==='live'?(p.live?' ・ ライブ配信中':' ・ 配信終了'):'');const player=$('#player');$('#videoModal').classList.add('show');if(p.type==='live'&&p.live&&liveStream){player.pause();player.removeAttribute('src');player.srcObject=liveStream;player.controls=false;$('#videoMessage').textContent='🔴 ライブ配信中（この端末のカメラ映像）';return;}player.srcObject=null;player.controls=true;$('#videoMessage').textContent=p.type==='live'?'この試作品では配信終了後の録画は保存していません。実際の録画・他の人へのライブ配信にはサーバー機能が必要です。':'';if(!p.video){player.removeAttribute('src');player.load();if(p.type!=='live')alert('この投稿には動画ファイルがありません。');return;}player.src=p.video;player.load();player.play().catch(()=>{});}
-function closeVideo(){const p=$('#player');p.pause();p.srcObject=null;p.removeAttribute('src');p.load();$('#videoModal').classList.remove('show');}
-function renderPost(p){const isLive=p.type==='live';const open=openComments.has(p.id);const videoBlock=p.video?`<div class="video-frame" data-play="${p.id}" role="button" tabindex="0" aria-label="動画を再生"><img class="thumb" src="${esc(p.thumbnail||'')}" alt="動画サムネイル"><span class="play">▶</span></div>`:'';const text=p.text?`<div class="bodytext">${esc(p.text)}</div>`:'';const badge=isLive?(p.live?'<span class="livebadge">● ライブ配信中</span>':'<span class="endedbadge">配信終了・録画</span>'):'';return `<article class="card" data-post="${p.id}"><div class="row">${avatarHtml(p.author,'avatar',p.author===data.name?data.avatar:(p.authorAvatar||''))}<div><strong>${esc(p.author)}</strong><div class="muted">${fmt(p.created)} ${badge}</div></div></div><div class="title">${esc(p.title||'')}</div>${text}${videoBlock}${p.fileName?`<p>📎 <a href="${esc(p.file||'#')}" download="${esc(p.fileName)}">${esc(p.fileName)}</a></p>`:''}<div class="actions"><button data-like="${p.id}">👍 いいね ${p.likes||0}</button><button data-comments="${p.id}" aria-expanded="${open}">💬 コメント (${(p.comments||[]).length}) ${open?'▲':'▼'}</button>${isLive&&p.live?`<button class="primary" data-play="${p.id}">🔴 ライブを見る</button>`:p.video?`<button data-play="${p.id}">▶ 動画を開く</button>`:''}</div><section class="comments ${open?'open':''}" id="comments-${p.id}"><div class="commentlist">${(p.comments||[]).length?(p.comments||[]).map(c=>`<div class="comment"><div class="commenthead">${avatarHtml(c.author,'avatar',c.author===data.name?data.avatar:(c.avatar||''))}<strong>${esc(c.author)}</strong><span class="muted">${fmt(c.created)}</span><div class="spacer"></div><button data-delcomment="${p.id}:${c.id}" title="コメント削除">削除</button></div><div class="commenttext">${esc(c.text)}</div></div>`).join(''):'<div class="muted">まだコメントはありません。</div>'}</div><form class="commentform" data-commentform="${p.id}"><input name="comment" maxlength="1000" placeholder="コメントを書く…" required aria-label="コメント"><button class="primary" type="submit">送信</button></form></section></article>`;}
-function render(){
-document.body.classList.toggle('dark',!!data.settings.dark);$('#who').textContent=data.name||'ゲスト';
-document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===data.page));
-const main=$('#main');
-if(data.page==='home'){main.innerHTML=`<div class="notice">ホームではみんなの投稿を見られます。投稿を作成するときは「マイチャンネル」を開いてね。</div>${data.posts.length?data.posts.map(renderPost).join(''):'<div class="card muted">まだ投稿はありません。マイチャンネルから最初の投稿を作ってみてね。</div>'}`;
-}else if(data.page==='channel'){main.innerHTML=`<section class="card"><h2>👤 マイチャンネル</h2><div class="row" style="align-items:center;margin:12px 0 18px">${avatarHtml(data.name,'profile-avatar',data.avatar)}<div><strong>プロフィールアイコン</strong><div class="muted">端末の写真・画像から選べます</div></div></div><label>アイコン画像を選ぶ<input id="avatarFile" type="file" accept="image/*"></label><p class="muted">JPG・PNG・WebPなどの画像。保存後、投稿やコメントにも反映されます。</p><hr><label>表示名<input id="profileName" value="${esc(data.name)}" maxlength="40"></label><div class="actions"><button class="primary" id="saveName">表示名を保存</button><button id="removeAvatar">アイコンを初期状態に戻す</button></div><p class="muted">大きなファイルも投稿操作を続けられます。ブラウザの保存上限を超えた場合、投稿はこの画面を開いている間は表示されますが、再読み込み後も残すにはサーバー保存が必要です。</p></section><section class="card"><h2>📝 投稿を作成</h2><form id="postForm" class="composer"><input name="title" maxlength="120" placeholder="タイトル（任意）"><select name="type"><option value="text">文章の投稿</option><option value="file">ファイル投稿</option><option value="vertical">縦動画</option><option value="horizontal">横動画</option></select><textarea name="text" placeholder="文章を書く（動画だけでも投稿できます）"></textarea><label>動画・ファイルを選ぶ<input name="media" type="file" accept="video/*,image/*,.pdf,.txt,.zip"></label><label>サムネイル画像（任意）<input name="thumbnail" type="file" accept="image/*"></label><button class="primary" type="submit">投稿する</button><button type="button" id="openLive">🔴 ライブ配信を始める</button></form></section><h3>自分の投稿</h3>${data.posts.filter(p=>p.author===data.name).map(renderPost).join('')||'<div class="card muted">投稿はまだありません。上の「投稿を作成」から投稿してみてね。</div>'}`;
-}else if(data.page==='mail'){
-const contacts=[...new Set([data.name,...data.posts.map(p=>p.author).filter(Boolean),...(data.contacts||[])])];
-const selected=data.openChat||'';
-const filtered=contacts.filter(n=>n.toLowerCase().includes((data.mailSearch||'').toLowerCase()));
-const chatMessages=selected?(data.messages||[]).filter(m=>(m.from===data.name&&m.to===selected)||(m.from===selected&&m.to===data.name)).sort((a,b)=>a.created-b.created):[];
-if(selected){main.innerHTML=`<section class="card"><div class="row"><button id="backToMail">← 戻る</button>${avatarHtml(selected,'avatar',selected===data.name?data.avatar:'')}<div><h2 style="margin:0">${esc(selected)}</h2><div class="muted">メール・チャット</div></div></div></section><section class="card" id="chatMessages" style="min-height:220px;max-height:52vh;overflow:auto">${chatMessages.length?chatMessages.map(m=>`<div class="comment" style="margin:10px 0;max-width:90%;margin-left:${m.from===data.name?'auto':'0'}"><div class="muted">${esc(m.from)} ・ ${fmt(m.created)}</div>${m.text?`<div class="bodytext">${esc(m.text)}</div>`:''}${m.image?`<img src="${esc(m.image)}" alt="送信画像" style="max-width:100%;max-height:280px;border-radius:10px;margin-top:6px">`:''}</div>`).join(''):'<p class="muted">まだメッセージはありません。下からメッセージを送れます。</p>'}</section><section class="card"><form id="mailForm" class="composer"><textarea name="message" placeholder="メッセージを書く…"></textarea><label>画像・GIFを添付<input name="mailImage" type="file" accept="image/*,.gif"></label><div class="muted">文字だけでも、画像・GIFを添付しても送れます。</div><button class="primary" type="submit">送信</button></form></section>`;setTimeout(()=>{const box=$('#chatMessages');if(box)box.scrollTop=box.scrollHeight;},0);
-}else{main.innerHTML=`<section class="card"><h2>✉️ メール</h2><input id="mailSearch" placeholder="相手の名前を検索" value="${esc(data.mailSearch||'')}"><p class="muted">相手のアイコンを押すとチャットを開けます。</p></section><section class="card">${filtered.map(n=>{const last=(data.messages||[]).filter(m=>(m.from===data.name&&m.to===n)||(m.from===n&&m.to===data.name)).sort((a,b)=>b.created-a.created)[0];return `<button data-chat="${esc(n)}" style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;margin:6px 0;padding:12px">${avatarHtml(n,'avatar',n===data.name?data.avatar:'')}<span style="flex:1"><strong>${esc(n)}</strong><div class="muted">${last?esc(last.text||'画像・GIF'):n===data.name?'自分のメール':'メッセージを開始'}</div></span><span>›</span></button>`;}).join('')||'<p class="muted">該当する相手はいません。</p>'}</section><div class="notice">このHTML内では、この端末に保存された会話を試せます。別の人の端末にメッセージを届けたり、登録ユーザー全員を自動表示したりするには、アカウント・メール用サーバーへの接続が必要です。</div>`;
-const si=$('#mailSearch');if(si)si.addEventListener('input',()=>{data.mailSearch=si.value;const pos=si.selectionStart;render();const next=$('#mailSearch');if(next){next.focus();next.setSelectionRange(pos,pos);}});
-}}
-else if(data.page==='search'){main.innerHTML=`<section class="card"><h2>🔍 検索</h2><input id="searchInput" placeholder="投稿タイトル・本文・名前を検索"><div id="searchResults"></div></section>`;$('#searchInput').addEventListener('input',()=>{const q=$('#searchInput').value.toLowerCase();$('#searchResults').innerHTML=data.posts.filter(p=>(p.title+' '+p.text+' '+p.author).toLowerCase().includes(q)).map(renderPost).join('')||'<p class="muted">一致する投稿がありません。</p>';});}
-else {main.innerHTML=`<section class="card"><h2>👥 友達</h2><p>友達機能はサーバー接続前の試作品です。</p></section>`;}
+(()=>{
+'use strict';
+
+const $=s=>document.querySelector(s);
+const TOKEN_KEY='jc_auth_token';
+let token=localStorage.getItem(TOKEN_KEY)||'';
+let me=null,posts=[],users=[],following=new Set(),allMessages=[],chatMessages=[];
+let page='home',dark=localStorage.getItem('jc_dark')==='1',activeChat='',searchQuery='',openComments=new Set(),liveStream=null;
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=t=>{let n=Number(t)||Date.now();if(n<1000000000000)n*=1000;return new Date(n).toLocaleString('ja-JP',{year:'numeric',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});};
+const avatarHtml=(name,cls='avatar',image='')=>`<div class="${cls}">${image?`<img src="${esc(image)}" alt="${esc(name||'ユーザー')}のアイコン">`:esc((name||'?').slice(0,1))}</div>`;
+const errMsg=e=>e?.message||'エラーが発生しました。もう一度試してください。';
+
+async function api(path,{method='GET',body}={}){
+  const headers={};
+  if(token)headers.Authorization='Bearer '+token;
+  if(body!==undefined)headers['Content-Type']='application/json';
+  let response;
+  try{response=await fetch(path,{method,headers,body:body===undefined?undefined:JSON.stringify(body)});}
+  catch(e){throw new Error('サーバーに接続できません。ページを再読み込みして、公開サイトが起動しているか確認してください。');}
+  let result={};
+  try{result=await response.json();}catch(e){}
+  if(!response.ok){
+    if(response.status===401&&token){token='';localStorage.removeItem(TOKEN_KEY);me=null;}
+    throw new Error(result.error||`通信エラー (${response.status})`);
+  }
+  return result;
 }
-$('#main').addEventListener('click',e=>{
-const chatBtn=e.target.closest('[data-chat]');if(chatBtn){data.openChat=chatBtn.dataset.chat;save();render();return;}
-if(e.target.id==='backToMail'){data.openChat='';save();render();return;}
-const commentBtn=e.target.closest('[data-comments]');if(commentBtn){const id=commentBtn.dataset.comments;const p=postBy(id);if(!p)return;if(openComments.has(id))openComments.delete(id);else openComments.add(id);const section=document.getElementById('comments-'+id);if(section){const isOpen=openComments.has(id);section.classList.toggle('open',isOpen);commentBtn.setAttribute('aria-expanded',String(isOpen));commentBtn.textContent=`💬 コメント (${(p.comments||[]).length}) ${isOpen?'▲':'▼'}`;}else render();return;}
-const like=e.target.closest('[data-like]');if(like){const p=postBy(like.dataset.like);if(p){p.likes=(p.likes||0)+1;save();render();}return;}
-const play=e.target.closest('[data-play]');if(play){openVideo(play.dataset.play);return;}
-const del=e.target.closest('[data-delcomment]');if(del){const [pid,cid]=del.dataset.delcomment.split(':');const p=postBy(pid);if(p){p.comments=(p.comments||[]).filter(c=>c.id!==cid);openComments.add(pid);save();render();}return;}
-if(e.target.id==='openLive')startLiveSetup();
-if(e.target.id==='saveName'){const v=$('#profileName').value.trim();if(v){data.name=v;save();render();}}
-if(e.target.id==='removeAvatar'){data.avatar='';save();render();}
+function notifyError(e){alert(errMsg(e));}
+function setToken(t){token=t||'';if(token)localStorage.setItem(TOKEN_KEY,token);else localStorage.removeItem(TOKEN_KEY);}
+
+function renderAuth(message=''){
+  $('#who').textContent='ログインしていません';
+  $('#nav').classList.add('hidden');
+  $('#logoutBtn').classList.add('hidden');
+  $('#main').innerHTML=`<div class="auth-wrap"><section class="card"><h1>🇯🇵 Japan Connect</h1><p class="muted">アカウントでログインすると、PCとスマホで同じ投稿やプロフィールを使えます。</p>${message?`<div class="notice">${esc(message)}</div>`:''}<div class="auth-tabs"><button id="showLogin" class="primary">ログイン</button><button id="showRegister">新規登録</button></div><form id="authForm" class="composer"><label>アカウント名<input id="authUsername" name="username" autocomplete="username" minlength="3" maxlength="24" pattern="[A-Za-z0-9_-]{3,24}" required placeholder="半角英数字・_・-、3〜24文字"></label><label>パスワード<input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required placeholder="8文字以上"></label><button class="primary" type="submit" id="authSubmit">ログイン</button><p id="authNote" class="muted">登録済みのアカウントでログインします。</p></form></section><p class="muted">アカウント登録後は、同じアカウント名とパスワードで別の端末からもログインできます。</p></div>`;
+  let mode='login';
+  const loginBtn=$('#showLogin'),regBtn=$('#showRegister'),submit=$('#authSubmit'),note=$('#authNote'),pass=$('#authPassword');
+  function setMode(m){
+    mode=m;
+    loginBtn.classList.toggle('primary',m==='login');
+    regBtn.classList.toggle('primary',m==='register');
+    submit.textContent=m==='login'?'ログイン':'アカウントを作成';
+    note.textContent=m==='login'?'登録済みのアカウントでログインします。':'新しくアカウントを作成します。パスワードは忘れないように保管してください。';
+    pass.autocomplete=m==='login'?'current-password':'new-password';
+  }
+  loginBtn.onclick=()=>setMode('login');
+  regBtn.onclick=()=>setMode('register');
+  $('#authForm').onsubmit=async e=>{
+    e.preventDefault();
+    const username=$('#authUsername').value.trim(),password=pass.value;
+    submit.disabled=true;submit.textContent='処理中…';
+    try{
+      const r=await api(mode==='login'?'/api/login':'/api/register',{method:'POST',body:{username,password}});
+      setToken(r.token);me=r.user;page='home';
+      await refreshAll();render();
+    }catch(err){
+      notifyError(err);submit.disabled=false;submit.textContent=mode==='login'?'ログイン':'アカウントを作成';
+    }
+  };
+}
+
+function normalizePost(p){
+  return {...p,id:Number(p.id),userId:Number(p.userId),author:p.author||p.username||'ユーザー',authorAvatar:p.avatar||'',created:p.created,type:p.type||'text',video:p.type==='video'?p.media:'',file:p.type==='file'?p.media:'',fileName:p.filename||'',likes:Number(p.likes)||0,liked:!!p.liked,comments:(p.comments||[]).map(c=>({...c,id:Number(c.id),text:c.text??c.body??'',created:c.created,avatar:c.avatar||''}))};
+}
+async function refreshFeed(){const r=await api('/api/feed');posts=(r.posts||[]).map(normalizePost);}
+async function refreshUsers(){const [u,f]=await Promise.all([api('/api/users?q='),api('/api/follows')]);users=u.users||[];following=new Set((f.users||[]).map(x=>Number(x.id)));}
+async function refreshAll(){const r=await api('/api/profile');me=r.user;await Promise.all([refreshFeed(),refreshUsers(),refreshInbox()]);}
+async function refreshInbox(){const r=await api('/api/messages');allMessages=r.messages||[];}
+async function refreshChat(){if(!activeChat){chatMessages=[];return;}const r=await api('/api/messages?with='+encodeURIComponent(activeChat));chatMessages=r.messages||[];}
+function whoAmI(){return Number(me?.id)||0;}
+function postBy(id){return posts.find(p=>String(p.id)===String(id));}
+
+function renderPost(p){
+  const isLive=p.type==='live',open=openComments.has(String(p.id)),mine=Number(p.userId)===whoAmI();
+  const videoBlock=p.video?`<div class="video-frame" data-play="${p.id}" role="button" tabindex="0" aria-label="動画を再生"><img class="thumb" src="${esc(p.thumbnail||'')}" alt="動画サムネイル"><span class="play">▶</span></div>`:'';
+  const text=p.text?`<div class="bodytext">${esc(p.text)}</div>`:'';
+  const badge=isLive?'<span class="endedbadge">ライブ配信機能は未接続</span>':'';
+  const fileBlock=p.fileName?`<p>📎 <a href="${esc(p.file||'#')}" download="${esc(p.fileName)}">${esc(p.fileName)}</a></p>`:'';
+  return `<article class="card" data-post="${p.id}"><div class="row">${avatarHtml(p.author,'avatar',p.authorAvatar||'')}<div><strong>${esc(p.author)}</strong><div class="muted">${fmt(p.created)} ${badge}</div><div class="muted">@${esc(p.username||'')}</div></div><div class="spacer"></div>${mine?`<button class="danger" data-delpost="${p.id}" title="投稿を削除">削除</button>`:''}</div><div class="title">${esc(p.title||'')}</div>${text}${videoBlock}${fileBlock}<div class="actions"><button data-like="${p.id}" class="${p.liked?'primary':''}">${p.liked?'👍 いいね済み':'👍 いいね'} ${p.likes||0}</button><button data-comments="${p.id}" aria-expanded="${open}">💬 コメント (${(p.comments||[]).length}) ${open?'▲':'▼'}</button>${p.video?`<button data-play="${p.id}">▶ 動画を開く</button>`:''}</div><section class="comments ${open?'open':''}" id="comments-${p.id}"><div class="commentlist">${(p.comments||[]).length?p.comments.map(c=>`<div class="comment"><div class="commenthead">${avatarHtml(c.author,'avatar',c.avatar||'')}<strong>${esc(c.author)}</strong><span class="muted">${fmt(c.created)}</span><div class="spacer"></div>${Number(c.userId)===whoAmI()||mine?`<button data-delcomment="${c.id}" title="コメント削除">削除</button>`:''}</div><div class="commenttext">${esc(c.text)}</div></div>`).join(''):'<div class="muted">まだコメントはありません。</div>'}</div><form class="commentform" data-commentform="${p.id}"><input name="comment" maxlength="5000" placeholder="コメントを書く…" required aria-label="コメント"><button class="primary" type="submit">送信</button></form></section></article>`;
+}
+
+function renderUser(u,context='friends'){
+  const isFollowing=following.has(Number(u.id));
+  return `<div class="user-row">${avatarHtml(u.name||u.username,'avatar',u.avatar||'')}<div class="user-detail"><strong>${esc(u.name||u.username)}</strong><div class="muted">@${esc(u.username)}</div></div>${context==='mail'?`<button data-chat="${esc(u.username)}">メール</button>`:`<button data-follow="${Number(u.id)}" class="${isFollowing?'':'primary'}">${isFollowing?'フォロー中':'フォロー'}</button>`}</div>`;
+}
+
+function render(){
+  document.body.classList.toggle('dark',dark);
+  $('#who').textContent=me?`${me.name||me.username} (@${me.username})`:'ログインしていません';
+  $('#settingsBtn').title='ライト／ダーク切替';
+  if(!me){renderAuth();return;}
+  $('#nav').classList.remove('hidden');$('#logoutBtn').classList.remove('hidden');
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===page));
+  const main=$('#main');
+
+  if(page==='home'){
+    main.innerHTML=`<div class="notice">ホームでは登録ユーザーみんなの投稿が表示されます。投稿を作るには「マイチャンネル」を開いてね。</div>${posts.length?posts.map(renderPost).join(''):'<div class="card muted">まだ投稿はありません。マイチャンネルから最初の投稿を作ってみてね。</div>'}`;
+  }else if(page==='channel'){
+    main.innerHTML=`<section class="card"><h2>👤 マイチャンネル</h2><div class="row" style="align-items:center;margin:12px 0 18px">${avatarHtml(me.name,'profile-avatar',me.avatar)}<div><strong>プロフィールアイコン</strong><div class="muted">写真・画像から選べます</div></div></div><label>アイコン画像を選ぶ<input id="avatarFile" type="file" accept="image/*"></label><p class="filehint">画像は900KB以下を選んでください。</p><hr><label>表示名<input id="profileName" value="${esc(me.name||me.username)}" maxlength="60"></label><div class="actions"><button class="primary" id="saveProfile">プロフィールを保存</button><button id="removeAvatar">アイコンを初期状態に戻す</button></div><p class="muted">プロフィールはサーバーに保存され、同じアカウントでログインしたPC・スマホに反映されます。</p></section><section class="card"><h2>📝 投稿を作成</h2><form id="postForm" class="composer"><input name="title" maxlength="200" placeholder="タイトル（任意）"><select name="type"><option value="text">文章の投稿</option><option value="file">ファイル投稿</option><option value="vertical">縦動画</option><option value="horizontal">横動画</option></select><textarea name="text" maxlength="20000" placeholder="文章を書く（動画だけでも投稿できます）"></textarea><label>動画・ファイルを選ぶ<input name="media" type="file" accept="video/*,image/*,.pdf,.txt,.zip"></label><label>サムネイル画像（任意）<input name="thumbnail" type="file" accept="image/*"></label><p class="filehint">添付ファイルとサムネイルは合計約4.5MBまで。大きな動画は投稿できません。</p><button class="primary" type="submit">投稿する</button><button type="button" id="openLive">🔴 カメラプレビュー</button></form></section><h3>自分の投稿</h3>${posts.filter(p=>Number(p.userId)===whoAmI()).map(renderPost).join('')||'<div class="card muted">投稿はまだありません。上の「投稿を作成」から投稿してみてね。</div>'}`;
+  }else if(page==='mail'){
+    const term=searchQuery.toLowerCase();
+    const contactList=users.filter(u=>(u.username+' '+(u.name||'')).toLowerCase().includes(term));
+    if(activeChat){
+      const chatUser=users.find(u=>u.username===activeChat);
+      main.innerHTML=`<section class="card"><div class="row"><button id="backToMail">← 戻る</button>${avatarHtml(chatUser?.name||activeChat,'avatar',chatUser?.avatar||'')}<div><h2 style="margin:0">${esc(chatUser?.name||activeChat)}</h2><div class="muted">@${esc(activeChat)} ・ メール</div></div></div></section><section class="card" id="chatMessages" style="min-height:220px;max-height:52vh;overflow:auto">${chatMessages.length?chatMessages.map(m=>`<div class="comment" style="margin:10px 0;max-width:90%;margin-left:${m.from===me.username?'auto':'0'}"><div class="muted">${esc(m.from)} ・ ${fmt(m.created)}</div>${m.text?`<div class="bodytext">${esc(m.text)}</div>`:''}${m.image?`<img src="${esc(m.image)}" alt="送信画像" style="max-width:100%;max-height:280px;border-radius:10px;margin-top:6px">`:''}</div>`).join(''):'<p class="muted">まだメッセージはありません。下から送信できます。</p>'}</section><section class="card"><form id="mailForm" class="composer"><textarea name="message" maxlength="10000" placeholder="メッセージを書く…"></textarea><label>画像・GIFを添付<input name="mailImage" type="file" accept="image/*,.gif"></label><p class="filehint">画像は約1MBまで。</p><button class="primary" type="submit">送信</button></form></section>`;
+      setTimeout(()=>{const box=$('#chatMessages');if(box)box.scrollTop=box.scrollHeight;},0);
+    }else{
+      main.innerHTML=`<section class="card"><h2>✉️ メール</h2><input id="mailSearch" placeholder="アカウント名・表示名を検索" value="${esc(searchQuery)}"><p class="muted">相手を選ぶとチャットを開けます。</p></section><section class="card">${contactList.length?contactList.map(u=>renderUser(u,'mail')).join(''):'<p class="muted">相手が見つかりません。検索語を変えてください。</p>'}</section><section class="card"><h3>最近のメール</h3>${allMessages.length?allMessages.slice(0,20).map(m=>{const other=m.from===me.username?m.to:m.from;return `<button data-chat="${esc(other)}" style="display:block;text-align:left;width:100%;margin:5px 0"><strong>${esc(other)}</strong><div class="muted">${esc(m.text||'画像・GIF')} ・ ${fmt(m.created)}</div></button>`;}).join(''):'<p class="muted">まだメールはありません。</p>'}</section>`;
+      const si=$('#mailSearch');
+      if(si)si.addEventListener('input',()=>{searchQuery=si.value;const pos=si.selectionStart;render();const el=$('#mailSearch');if(el){el.focus();el.setSelectionRange(pos,pos);}});
+    }
+  }else if(page==='search'){
+    main.innerHTML=`<section class="card"><h2>🔍 検索</h2><input id="searchInput" value="${esc(searchQuery)}" placeholder="投稿のタイトル・本文・名前を検索"><div id="searchResults"></div></section>`;
+    const draw=()=>{const q=$('#searchInput').value.toLowerCase();searchQuery=$('#searchInput').value;const result=posts.filter(p=>(p.title+' '+p.text+' '+p.author+' '+p.username).toLowerCase().includes(q));$('#searchResults').innerHTML=result.map(renderPost).join('')||'<p class="muted">一致する投稿がありません。</p>';};
+    $('#searchInput').addEventListener('input',draw);draw();
+  }else{
+    const term=searchQuery.toLowerCase();
+    const list=users.filter(u=>(u.username+' '+(u.name||'')).toLowerCase().includes(term));
+    main.innerHTML=`<section class="card"><h2>👥 友達・フォロー</h2><input id="friendSearch" placeholder="ユーザーを検索" value="${esc(searchQuery)}"><p class="muted">フォローするとフォロー中リストに反映されます。</p><h3>フォロー中</h3>${list.filter(u=>following.has(Number(u.id))).map(u=>renderUser(u)).join('')||'<p class="muted">まだフォローしていません。</p>'}<hr><h3>ユーザーを探す</h3>${list.filter(u=>!following.has(Number(u.id))).map(u=>renderUser(u)).join('')||'<p class="muted">ほかのユーザーはいません。</p>'}</section>`;
+    const si=$('#friendSearch');
+    if(si)si.addEventListener('input',()=>{searchQuery=si.value;const pos=si.selectionStart;render();const next=$('#friendSearch');if(next){next.focus();next.setSelectionRange(pos,pos);}});
+  }
+}
+
+async function openChat(username){activeChat=username;await refreshChat();page='mail';render();}
+
+$('#main').addEventListener('click',async e=>{
+  const chat=e.target.closest('[data-chat]');
+  if(chat){try{await openChat(chat.dataset.chat);}catch(err){notifyError(err);}return;}
+  if(e.target.id==='backToMail'){activeChat='';await refreshInbox().catch(()=>{});render();return;}
+  const follow=e.target.closest('[data-follow]');
+  if(follow){
+    const id=Number(follow.dataset.follow),is=following.has(id);
+    if(is&&!confirm('このユーザーのフォローを解除しますか？'))return;
+    follow.disabled=true;
+    try{const r=await api(`/api/users/${id}/follow`,{method:'POST',body:{}});if(r.following)following.add(id);else following.delete(id);await refreshUsers();render();}
+    catch(err){notifyError(err);}return;
+  }
+  const like=e.target.closest('[data-like]');
+  if(like){like.disabled=true;try{await api(`/api/posts/${Number(like.dataset.like)}/like`,{method:'POST',body:{}});await refreshFeed();render();}catch(err){notifyError(err);}return;}
+  const cbtn=e.target.closest('[data-comments]');
+  if(cbtn){const id=String(cbtn.dataset.comments);openComments.has(id)?openComments.delete(id):openComments.add(id);render();return;}
+  const play=e.target.closest('[data-play]');
+  if(play){openVideo(Number(play.dataset.play));return;}
+  const delPost=e.target.closest('[data-delpost]');
+  if(delPost){const id=Number(delPost.dataset.delpost);if(!confirm('この投稿を削除しますか？'))return;try{await api(`/api/posts/${id}/delete`,{method:'POST',body:{}});await refreshFeed();render();}catch(err){notifyError(err);}return;}
+  const delComment=e.target.closest('[data-delcomment]');
+  if(delComment){if(!confirm('このコメントを削除しますか？'))return;try{await api(`/api/comments/${Number(delComment.dataset.delcomment)}/delete`,{method:'POST',body:{}});await refreshFeed();render();}catch(err){notifyError(err);}return;}
+  if(e.target.id==='saveProfile'){
+    const name=$('#profileName').value.trim();if(!name){alert('表示名を入力してください。');return;}
+    try{const r=await api('/api/profile',{method:'POST',body:{name,avatar:me.avatar||''}});me=r.user;await refreshFeed();render();alert('プロフィールを保存しました。');}
+    catch(err){notifyError(err);}return;
+  }
+  if(e.target.id==='removeAvatar'){
+    try{const r=await api('/api/profile',{method:'POST',body:{name:me.name||me.username,avatar:''}});me=r.user;await refreshFeed();render();}
+    catch(err){notifyError(err);}return;
+  }
+  if(e.target.id==='openLive')startLiveSetup();
 });
-$('#main').addEventListener('change',async e=>{if(e.target.id==='avatarFile'){const file=e.target.files&&e.target.files[0];if(!file)return;if(!file.type.startsWith('image/')){alert('画像ファイルを選んでください。');e.target.value='';return;}if(file.size>2*1024*1024){alert('画像は2MB以下を選んでください。');e.target.value='';return;}try{data.avatar=await fileData(file);save();render();}catch(err){alert('画像を読み込めませんでした。');}}});
+
+$('#main').addEventListener('change',async e=>{
+  if(e.target.id==='avatarFile'){
+    const file=e.target.files?.[0];if(!file)return;
+    if(!file.type.startsWith('image/')){alert('画像ファイルを選んでください。');return;}
+    if(file.size>900*1024){alert('プロフィール画像は900KB以下にしてください。');return;}
+    try{const avatar=await fileData(file);const r=await api('/api/profile',{method:'POST',body:{name:me.name||me.username,avatar}});me=r.user;await refreshFeed();render();}
+    catch(err){notifyError(err);}
+  }
+});
+
 $('#main').addEventListener('submit',async e=>{
-if(e.target.id==='mailForm'){e.preventDefault();const form=e.target;const text=form.message.value.trim();const imageFile=form.mailImage.files&&form.mailImage.files[0];let image='';if(imageFile){if(!imageFile.type.startsWith('image/')){alert('画像またはGIFを選んでください。');return;}try{image=await fileData(imageFile);}catch(err){alert('画像を読み込めませんでした。');return;}}if(!text&&!image){alert('メッセージか画像を入力してください。');return;}data.messages=data.messages||[];data.messages.push({id:nextId(),from:data.name,to:data.openChat,text,image,created:Date.now()});save();render();return;}
-if(e.target.id==='postForm'){e.preventDefault();const f=e.target;const title=f.title.value.trim();const text=f.text.value.trim();const type=f.type.value;const file=f.media.files[0];let video='',fileDataUrl='',fileName='',thumbnail='';if(file){const url=await fileData(file);fileName=file.name;if(file.type.startsWith('video/'))video=url;else fileDataUrl=url;}
-const thumbFile=f.thumbnail.files[0];if(thumbFile){thumbnail=await fileData(thumbFile);}else if(video)thumbnail=await thumbFromVideo(video);
-if(!title&&!text&&!file){alert('タイトル・本文・ファイルのどれかを入力してください。');return;}
-addPost({type:type==='vertical'||type==='horizontal'?'video':type,title,text,video,thumbnail,file:fileDataUrl,fileName,orientation:type==='vertical'?'vertical':type==='horizontal'?'horizontal':''});}
-const cf=e.target.closest('[data-commentform]');if(cf){e.preventDefault();const id=cf.dataset.commentform;const input=cf.elements.comment;const value=input.value.trim();if(!value)return;const p=postBy(id);if(!p)return;p.comments=p.comments||[];p.comments.push({id:nextId(),author:data.name,text:value,created:Date.now()});openComments.add(id);save();render();const sec=document.getElementById('comments-'+id);if(sec){sec.classList.add('open');const inp=sec.querySelector('input[name="comment"]');if(inp)inp.focus();}}
+  if(e.target.id==='postForm'){
+    e.preventDefault();
+    const form=e.target,submit=form.querySelector('button[type="submit"]');submit.disabled=true;
+    try{
+      const title=form.title.value.trim(),text=form.text.value.trim(),choice=form.type.value,file=form.media.files?.[0],thumbFile=form.thumbnail.files?.[0];
+      let media='',filename='',thumbnail='';
+      if(file){if(file.size>3*1024*1024)throw new Error('添付ファイルは3MB以下にしてください。');media=await fileData(file);filename=file.name;}
+      if(thumbFile){if(thumbFile.size>700*1024)throw new Error('サムネイルは700KB以下にしてください。');thumbnail=await fileData(thumbFile);}
+      else if(file?.type.startsWith('video/'))thumbnail=await thumbFromVideo(media);
+      if(!title&&!text&&!file)throw new Error('タイトル・本文・ファイルのどれかを入力してください。');
+      const type=choice==='vertical'||choice==='horizontal'?'video':choice;
+      await api('/api/posts',{method:'POST',body:{type,title,text,media,filename,thumbnail,orientation:choice==='vertical'?'vertical':choice==='horizontal'?'horizontal':''}});
+      await refreshFeed();page='home';form.reset();render();alert('投稿しました。ホームに共有されました。');
+    }catch(err){notifyError(err);}
+    finally{submit.disabled=false;}
+    return;
+  }
+  const cf=e.target.closest('[data-commentform]');
+  if(cf){
+    e.preventDefault();
+    const id=Number(cf.dataset.commentform),field=cf.elements.comment,text=field.value.trim();if(!text)return;
+    const submit=cf.querySelector('button');submit.disabled=true;
+    try{await api(`/api/posts/${id}/comments`,{method:'POST',body:{text}});openComments.add(String(id));await refreshFeed();render();const sec=$(`#comments-${id}`);sec?.classList.add('open');}
+    catch(err){notifyError(err);}return;
+  }
+  if(e.target.id==='mailForm'){
+    e.preventDefault();
+    const form=e.target,text=form.message.value.trim(),file=form.mailImage.files?.[0];let image='';
+    if(file){if(!file.type.startsWith('image/')){alert('画像またはGIFを選んでください。');return;}if(file.size>900*1024){alert('画像は900KB以下にしてください。');return;}try{image=await fileData(file);}catch(err){notifyError(err);return;}}
+    if(!text&&!image){alert('メッセージか画像を入力してください。');return;}
+    const btn=form.querySelector('button[type="submit"]');btn.disabled=true;
+    try{await api('/api/messages',{method:'POST',body:{to:activeChat,text,image}});form.reset();await refreshChat();await refreshInbox();render();}
+    catch(err){notifyError(err);}
+    finally{btn.disabled=false;}
+    return;
+  }
 });
-document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{data.page=b.dataset.page;render();}));
-$('#settingsBtn').addEventListener('click',()=>{data.settings.dark=!data.settings.dark;save();render();});
-$('#closeVideo').addEventListener('click',closeVideo);$('#videoModal').addEventListener('click',e=>{if(e.target.id==='videoModal')closeVideo();});
-let livePost=null;
-async function startLiveSetup(){if(!navigator.mediaDevices?.getUserMedia){alert('このブラウザではカメラを使えません。HTTPSまたはlocalhostで開いてください。');return;}$('#liveModal').classList.add('show');$('#liveStatus').textContent='カメラの使用を許可して「配信を開始」を押してください。';$('#startLive').disabled=false;$('#endLive').disabled=true;}
-$('#openLive')?.addEventListener('click',startLiveSetup);
+
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',async()=>{
+  page=b.dataset.page;searchQuery='';activeChat='';
+  try{if(page==='mail')await refreshInbox();if(page==='friends')await refreshUsers();}
+  catch(err){notifyError(err);}
+  render();
+}));
+
+$('#settingsBtn').addEventListener('click',()=>{dark=!dark;localStorage.setItem('jc_dark',dark?'1':'0');render();});
+
+$('#logoutBtn').addEventListener('click',async()=>{
+  try{await api('/api/logout',{method:'POST',body:{}});}catch(e){}
+  setToken('');me=null;posts=[];users=[];following.clear();allMessages=[];activeChat='';
+  renderAuth('ログアウトしました。');
+});
+
+function fileData(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(String(r.result));
+    r.onerror=()=>reject(new Error('ファイルを読み込めませんでした。'));
+    r.readAsDataURL(file);
+  });
+}
+function thumbFromVideo(src){
+  return new Promise(resolve=>{
+    const v=document.createElement('video');v.muted=true;v.preload='metadata';v.src=src;
+    const done=x=>{v.src='';resolve(x);};
+    v.onloadeddata=()=>{try{v.currentTime=Math.min(1,Math.max(0,v.duration/4));}catch(e){done('');}};
+    v.onseeked=()=>{try{const c=document.createElement('canvas');c.width=640;c.height=360;c.getContext('2d').drawImage(v,0,0,640,360);done(c.toDataURL('image/jpeg',.65));}catch(e){done('');}};
+    v.onerror=()=>done('');
+    setTimeout(()=>done(''),4000);
+  });
+}
+function openVideo(id){
+  const p=postBy(id);if(!p)return;
+  $('#videoTitle').textContent=p.title||'動画';
+  $('#videoInfo').textContent=p.author+' ・ '+fmt(p.created);
+  const player=$('#player');player.srcObject=null;player.controls=true;$('#videoMessage').textContent='';
+  $('#videoModal').classList.add('show');
+  if(!p.video){player.removeAttribute('src');player.load();$('#videoMessage').textContent='この投稿には動画ファイルがありません。';return;}
+  player.src=p.video;player.load();player.play().catch(()=>{});
+}
+function closeVideo(){
+  const p=$('#player');p.pause();p.srcObject=null;p.removeAttribute('src');p.load();$('#videoModal').classList.remove('show');
+}
+$('#closeVideo').addEventListener('click',closeVideo);
+$('#videoModal').addEventListener('click',e=>{if(e.target.id==='videoModal')closeVideo();});
+
+async function startLiveSetup(){
+  if(!navigator.mediaDevices?.getUserMedia){alert('このブラウザではカメラを使えません。HTTPSまたはlocalhostで開いてください。');return;}
+  $('#liveModal').classList.add('show');
+  $('#liveStatus').textContent='カメラの使用を許可して「カメラを開始」を押してください。';
+  $('#startLive').disabled=false;$('#endLive').disabled=true;
+}
 $('#startLive').addEventListener('click',async()=>{
-try{liveStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});$('#livePreview').srcObject=liveStream;const title=prompt('ライブ配信のタイトルを入力してください','ライブ配信');if(title===null){liveStream.getTracks().forEach(t=>t.stop());liveStream=null;return;}
-let liveThumb='';try{const v=$('#livePreview');const c=document.createElement('canvas');c.width=640;c.height=360;c.getContext('2d').drawImage(v,0,0,640,360);liveThumb=c.toDataURL('image/jpeg',.7);}catch(e){}livePost={id:nextId(),author:data.name,created:Date.now(),type:'live',title:title.trim()||'ライブ配信',text:'ライブ配信中です。',comments:[],likes:0,live:true,video:'',thumbnail:liveThumb};data.posts.unshift(livePost);livePostId=livePost.id;save();data.page='channel';render();$('#liveModal').classList.add('show');$('#liveStatus').textContent='配信中です。投稿は開始時点ですでにホームに表示されています。';$('#startLive').disabled=true;$('#endLive').disabled=false;
-}catch(err){$('#liveStatus').textContent='カメラ・マイクを開始できませんでした。ブラウザの許可設定を確認してください。';}
+  try{
+    liveStream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+    $('#livePreview').srcObject=liveStream;
+    $('#liveStatus').textContent='この端末でカメラプレビュー中です。他のユーザーには配信されていません。';
+    $('#startLive').disabled=true;$('#endLive').disabled=false;
+  }catch(err){$('#liveStatus').textContent='カメラ・マイクを開始できませんでした。ブラウザの許可設定を確認してください。';}
 });
-$('#endLive').addEventListener('click',()=>{
-if(!livePost)return;
-if(liveStream){liveStream.getTracks().forEach(t=>t.stop());liveStream=null;}
-livePost.live=false;livePost.text='ライブ配信は終了しました。';livePost.created=livePost.created||Date.now();save();$('#livePreview').srcObject=null;$('#liveStatus').textContent='配信を終了しました。投稿はホームに残り、配信終了と表示されます。';$('#startLive').disabled=false;$('#endLive').disabled=true;render();
-});
-$('#closeLive').addEventListener('click',()=>$('#liveModal').classList.remove('show'));
-$('#main').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-play]'))openVideo(e.target.dataset.play);});
-render();
+function stopLive(){
+  if(liveStream){liveStream.getTracks().forEach(t=>t.stop());liveStream=null;}
+  $('#livePreview').srcObject=null;$('#liveStatus').textContent='カメラを停止しました。';$('#startLive').disabled=false;$('#endLive').disabled=true;
+}
+$('#endLive').addEventListener('click',stopLive);
+$('#closeLive').addEventListener('click',()=>{$('#liveModal').classList.remove('show');stopLive();});
+$('#main').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('[data-play]'))openVideo(Number(e.target.dataset.play));});
+
+async function start(){
+  document.body.classList.toggle('dark',dark);
+  if(!token){renderAuth();return;}
+  try{const r=await api('/api/me');me=r.user;await refreshAll();render();}
+  catch(err){setToken('');me=null;renderAuth(err.message==='ログインしてください'?'ログインしてください。':'ログインし直してください。');}
+}
+start();
 })();
 </script>
 </body>
