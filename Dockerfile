@@ -1,7 +1,12 @@
-FROM python:3.13-slim
-WORKDIR /app
-COPY index.html ./index.html
-COPY server.py ./server.py
 
-EXPOSE 8000
-CMD ["python", "-u", "server.py"]
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY . .
+
+RUN pip install --no-cache-dir "psycopg[binary]"
+
+ENV PYTHONUNBUFFERED=1
+
+CMD ["python", "server.py"]
