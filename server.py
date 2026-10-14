@@ -1,4 +1,3 @@
-
 import hashlib
 import hmac
 import json
@@ -603,4 +602,3 @@ initialize_db()
 print("Japan Connect サーバー起動")
 print(f"ポート: {PORT}")
 ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
-
