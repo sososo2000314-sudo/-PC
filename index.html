@@ -417,30 +417,45 @@ async function start(){
   catch(err){setToken('');me=null;renderAuth(err.message==='ログインしてください'?'ログインしてください。':'ログインし直してください。');}
 }
 
-setInterval(async()=>{
-  if(!me||!token||autoRefreshing)return;
-  autoRefreshing=true;
-  try{
-    // 投稿を先に取得して表示する。ユーザー・メールの更新を待たせない。
+
+  let autoRefreshing = false;
+
+setInterval(async () => {
+  if (!me || !token || autoRefreshing) return;
+
+  autoRefreshing = true;
+
+  try {
+    // 投稿を先に更新して、画面にすぐ反映
     await refreshFeed();
-    if(!document.activeElement?.matches('input, textarea, select')){
-      render();
+
+    const isTyping =
+      document.activeElement?.matches('input, textarea, select');
+
+    if (!isTyping) render();
+
+    // ほかのデータは同時に読み込む
+    const jobs = [
+      refreshUsers(),
+      refreshInbox()
+    ];
+
+    if (activeChat) {
+      jobs.push(refreshChat());
     }
 
-    // 投稿以外の情報は並行して取得する。
-    const tasks=[refreshUsers(),refreshInbox()];
-    if(activeChat)tasks.push(refreshChat());
-    await Promise.all(tasks);
+    await Promise.all(jobs);
 
-    if(!document.activeElement?.matches('input, textarea, select')){
-      render();
-    }
-  }catch(e){
-    console.log('自動更新をスキップしました:',e.message);
-  }finally{
-    autoRefreshing=false;
+    if (!isTyping) render();
+
+  } catch (e) {
+    console.log('自動更新をスキップしました:', e.message);
+  } finally {
+    autoRefreshing = false;
   }
-},5000);
+}, 5000);
+
+  
 
 start();
 })();
