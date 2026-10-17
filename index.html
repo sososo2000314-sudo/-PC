@@ -1,4 +1,28 @@
 
+setInterval(async () => {
+  if (!token || !me || document.hidden) return;
+
+  const active = document.activeElement;
+
+  // 入力中の文章を消さないようにする
+  if (
+    active &&
+    active.matches('input, textarea, select')
+  ) return;
+
+  try {
+    await refreshAll();
+
+    if (page === 'mail' && activeChat) {
+      await refreshChat();
+    }
+
+    render();
+  } catch (e) {
+    // 一時的な通信エラーでは画面を止めない
+  }
+}, 5000);
+
 <!doctype html>
 <html lang="ja">
 <head>
