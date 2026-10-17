@@ -1,27 +1,4 @@
 
-setInterval(async () => {
-  if (!token || !me || document.hidden) return;
-
-  const active = document.activeElement;
-
-  // 入力中の文章を消さないようにする
-  if (
-    active &&
-    active.matches('input, textarea, select')
-  ) return;
-
-  try {
-    await refreshAll();
-
-    if (page === 'mail' && activeChat) {
-      await refreshChat();
-    }
-
-    render();
-  } catch (e) {
-    // 一時的な通信エラーでは画面を止めない
-  }
-}, 5000);
 
 <!doctype html>
 <html lang="ja">
@@ -402,6 +379,25 @@ async function start(){
   try{const r=await api('/api/me');me=r.user;await refreshAll();render();}
   catch(err){setToken('');me=null;renderAuth(err.message==='ログインしてください'?'ログインしてください。':'ログインし直してください。');}
 }
+  setInterval(async()=>{
+  if(!me||!token)return;
+  try{
+    await refreshFeed();
+    await refreshUsers();
+    await refreshInbox();
+    if(activeChat){
+      await refreshChat();
+    }
+    if(document.activeElement?.matches('input, textarea, select')){
+      return;
+    }
+    render();
+  }catch(e){
+    console.log('自動更新をスキップしました:',e.message);
+  }
+},5000);
+
+
 start();
 })();
 </script>
