@@ -23,11 +23,14 @@ class HybridRow(dict):
             return list(self.values())[key]
         return super().__getitem__(key)
 
-
 def hybrid_row(cursor):
-    columns = [column.name for column in cursor.description]
-    return lambda values: HybridRow(zip(columns, values))
+    description = cursor.description
 
+    if description is None:
+        return lambda values: values
+
+    columns = [column.name for column in description]
+    return lambda values: HybridRow(zip(columns, values))
 
 class CompatCursor:
     def __init__(self, cursor, returns_id=False):
