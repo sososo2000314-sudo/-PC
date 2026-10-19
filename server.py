@@ -13,7 +13,7 @@ from urllib.parse import urlparse, parse_qs
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
 PORT = int(os.environ.get("PORT", "8000"))
-MAX_BODY = 5_000_000
+MAX_BODY = 80_000_000
 
 
 class HybridRow(dict):
@@ -23,14 +23,16 @@ class HybridRow(dict):
             return list(self.values())[key]
         return super().__getitem__(key)
 
-def hybrid_row(cursor):
-    description = cursor.description
 
+def hybrid_row(cursor):
+    # PostgreSQL commands such as CREATE TABLE may not return columns.
+    # Psycopg still asks for a row factory, so provide a harmless fallback.
+    description = cursor.description
     if description is None:
         return lambda values: values
-
     columns = [column.name for column in description]
     return lambda values: HybridRow(zip(columns, values))
+
 
 class CompatCursor:
     def __init__(self, cursor, returns_id=False):
@@ -217,7 +219,7 @@ class Handler(SimpleHTTPRequestHandler):
             raise ValueError("リクエストサイズが不正です")
 
         if length < 0 or length > MAX_BODY:
-            raise ValueError("データが大きすぎます（最大5MB）")
+            raise ValueError("送信データが大きすぎます。動画は50MB以下にしてください。")
 
         raw = self.rfile.read(length)
         try:
@@ -274,6 +276,20 @@ class Handler(SimpleHTTPRequestHandler):
                         "ok": False, "error": "ログインしてください"
                     })
 
+                media_match = re.fullmatch(r"/api/posts/(\d+)/media", path)
+                if media_match:
+                    post_id = int(media_match.group(1))
+                    row = db.execute(
+                        "SELECT media, filename FROM posts WHERE id=?",
+                        (post_id,)
+                    ).fetchone()
+                    if not row or not row["media"]:
+                        return self.send_json(404, {"ok": False, "error": "メディアが見つかりません"})
+                    # メディア本体は再生・ダウンロード時だけ返す。フィード全体の通信を軽くする。
+                    return self.send_json(200, {
+                        "ok": True, "media": row["media"], "filename": row["filename"] or "download"
+                    })
+
                 if path == "/api/me":
                     return self.send_json(200, {
                         "ok": True, "user": public_user(user)
@@ -325,7 +341,7 @@ class Handler(SimpleHTTPRequestHandler):
                             "type": row["post_type"],
                             "title": row["title"],
                             "text": row["body"],
-                            "media": row["media"],
+                            "hasMedia": bool(row["media"]),
                             "filename": row["filename"],
                             "thumbnail": row["thumbnail"],
                             "orientation": row["orientation"],
@@ -513,9 +529,11 @@ class Handler(SimpleHTTPRequestHandler):
                     filename = str(data.get("filename", ""))[:255]
                     thumbnail = str(data.get("thumbnail", ""))
                     orientation = str(data.get("orientation", "vertical"))
-                    if len(media) + len(thumbnail) > 4_500_000:
-                        return self.send_json(400, {
-                            "ok": False, "error": "添付ファイルが大きすぎます（合計約4.5MBまで）"
+                    # 動画は最大50MB。Data URLはBase64で約1.33倍になるため、
+                    # JSON全体の上限(MAX_BODY)とは別に格納データも検査する。
+                    if len(media) + len(thumbnail) > 70_000_000:
+                        return self.send_json(413, {
+                            "ok": False, "error": "動画・添付ファイルが大きすぎます。動画は50MB以下、サムネイルは700KB以下にしてください。"
                         })
                     cur = db.execute("""
                         INSERT INTO posts
